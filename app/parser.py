@@ -97,13 +97,15 @@ def _parse_line_items(fa: ET.Element) -> list[LineItem]:
     items = []
     for wiersz in fa.findall(_tag("FaWiersz")):
         exchange_rate = _text(wiersz, "KursWaluty")
+        unit_net_price = _text(wiersz, "P_9A") or _text(wiersz, "P_9B")
+        net_value = _text(wiersz, "P_11") or _text(wiersz, "P_11A")
         items.append(LineItem(
             line_number=int(_text(wiersz, "NrWierszaFa") or "0"),
             name=_text(wiersz, "P_7"),
             unit=_text(wiersz, "P_8A"),
             quantity=_text(wiersz, "P_8B"),
-            unit_net_price=_text(wiersz, "P_9A"),
-            net_value=_text(wiersz, "P_11"),
+            unit_net_price=unit_net_price,
+            net_value=net_value,
             tax_rate=_text(wiersz, "P_12"),
             exchange_rate=exchange_rate,
         ))

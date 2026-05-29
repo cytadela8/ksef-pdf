@@ -48,6 +48,20 @@ def test_parse_line_items():
     assert item.exchange_rate == "4.2346"
 
 
+def test_parse_line_items_falls_back_to_gross_fields(tmp_path):
+    xml = FIXTURE.read_text()
+    xml = xml.replace("<P_9A>1234.56</P_9A>", "<P_9B>5000</P_9B>")
+    xml = xml.replace("<P_11>1234.56</P_11>", "<P_11A>5000</P_11A>")
+    path = tmp_path / "invoice.xml"
+    path.write_text(xml)
+
+    result = parse_invoice(path)
+
+    item = result.line_items[0]
+    assert item.unit_net_price == "5000"
+    assert item.net_value == "5000"
+
+
 def test_parse_tax_summary():
     result = parse_invoice(FIXTURE)
     assert len(result.tax_summary) == 1
